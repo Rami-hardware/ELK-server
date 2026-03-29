@@ -5,7 +5,7 @@ on:
     branches:
       - development
       - staging
-      - main
+      - master
 
 env:
   ALICLOUD_ACCESS_KEY: ${{ secrets.ALICLOUD_ACCESS_KEY }}
