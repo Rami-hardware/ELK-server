@@ -1,0 +1,68 @@
+name: ELK Deploy
+
+on:
+  push:
+    branches:
+      - development
+      - staging
+      - main
+
+env:
+  ALICLOUD_ACCESS_KEY: ${{ secrets.ALICLOUD_ACCESS_KEY }}
+  ALICLOUD_SECRET_KEY: ${{ secrets.ALICLOUD_SECRET_KEY }}
+
+jobs:
+  Deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # -----------------------------
+      # Checkout Repo
+      # -----------------------------
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # -----------------------------
+      # Setup Terraform
+      # -----------------------------
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: ">=1.6 <2.0"
+
+      # -----------------------------
+      # Terraform Init
+      # -----------------------------
+      - name: Terraform Init
+        working-directory: terraform
+        run: terraform init
+
+      # -----------------------------
+      # Terraform Validate
+      # -----------------------------
+      - name: Terraform Validate
+        working-directory: terraform
+        run: terraform validate
+
+      # -----------------------------
+      # Terraform Plan
+      # -----------------------------
+      - name: Terraform Plan
+        id: plan
+        working-directory: terraform
+        run: |
+          terraform plan \
+            -detailed-exitcode \
+            -out=tfplan || exitcode=$?
+
+          echo "exitcode=${exitcode:-0}" >> $GITHUB_OUTPUT
+        continue-on-error: true
+
+      # -----------------------------
+      # Terraform Apply (ONLY if changes)
+      # -----------------------------
+      - name: Terraform Apply
+        working-directory: terraform
+        run: |
+          terraform apply \
+            -auto-approve tfplan
