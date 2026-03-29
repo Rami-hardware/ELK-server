@@ -43,11 +43,11 @@
                 - source_labels: [__address__]
                   regex: "10.50.6.211:.*"
                   target_label: instance
-                  replacement: "FAC-Cloud-Share"
+                  replacement: "cognna-ecs"
                 - source_labels: [__address__]
                   regex: "10.50.2.127:.*"
                   target_label: instance
-                  replacement: "FAC-Cloud-Share-2"
+                  replacement: "FAC-Cloud-Share"
 
             - job_name: "windows-ecs"
               static_configs:
