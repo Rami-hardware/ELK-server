@@ -7,7 +7,7 @@ data "alicloud_vswitches" "existing" {
 }
 
 module "ecs" {
-  source = "./modules/ecs"
+  source = "./modules"
   vpc_id     = data.alicloud_vpcs.existing.vpcs[0].id
   vswitch_id = data.alicloud_vswitches.existing.vswitches[0].id
 }
