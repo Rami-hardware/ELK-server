@@ -4,3 +4,6 @@
   roles:
     - DNS
     - Docker
+    - Loki
+    - Prometheus
+    - Grafana
