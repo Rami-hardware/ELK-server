@@ -22,6 +22,33 @@
               static_configs:
                 - targets: ["localhost:9090"]
 
+            - job_name: "linux-ecs"
+              static_configs:
+                - targets:
+                    - "10.50.6.215:9100"
+                    - "10.50.6.213:9100"
+                    - "10.50.6.211:9100"
+                    - "10.50.2.127:9100"
+                  labels:
+                    os: "linux"
+              relabel_configs:
+                - source_labels: [__address__]
+                  regex: "10.50.6.215:.*"
+                  target_label: instance
+                  replacement: "nextcloud-ecs-office"
+                - source_labels: [__address__]
+                  regex: "10.50.6.213:.*"
+                  target_label: instance
+                  replacement: "nextcloud-ecs"
+                - source_labels: [__address__]
+                  regex: "10.50.6.211:.*"
+                  target_label: instance
+                  replacement: "FAC-Cloud-Share"
+                - source_labels: [__address__]
+                  regex: "10.50.2.127:.*"
+                  target_label: instance
+                  replacement: "FAC-Cloud-Share-2"
+
             - job_name: "windows-ecs"
               static_configs:
                 - targets: ["10.50.1.85:9182"]
