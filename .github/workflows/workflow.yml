@@ -5,65 +5,106 @@ on:
     branches:
       - development
       - staging
-      - master
+      - master   # change to main if needed
+
+env:
+  ALICLOUD_ACCESS_KEY: ${{ secrets.ALICLOUD_ACCESS_KEY }}
+  ALICLOUD_SECRET_KEY: ${{ secrets.ALICLOUD_SECRET_KEY }}
 
 jobs:
   Deploy:
     runs-on: ubuntu-latest
 
     steps:
+      # -----------------------------
+      # Checkout Repo
+      # -----------------------------
       - name: Checkout code
         uses: actions/checkout@v3
 
+      # -----------------------------
+      # Setup Terraform
+      # -----------------------------
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v2
         with:
           terraform_version: ">=1.6 <2.0"
 
+      # -----------------------------
+      # Terraform Init
+      # -----------------------------
       - name: Terraform Init
         working-directory: terraform
         run: terraform init
 
+      # -----------------------------
+      # Terraform Validate
+      # -----------------------------
       - name: Terraform Validate
         working-directory: terraform
         run: terraform validate
 
+      # -----------------------------
+      # Terraform Plan
+      # -----------------------------
       - name: Terraform Plan
         id: plan
         working-directory: terraform
         run: |
           set +e
           terraform plan -detailed-exitcode -out=tfplan \
-            -var="alicloud_access_key=${{ secrets.ALICLOUD_ACCESS_KEY }}" \
-            -var="alicloud_secret_key=${{ secrets.ALICLOUD_SECRET_KEY }}"
+            -var="alicloud_access_key=$ALICLOUD_ACCESS_KEY" \
+            -var="alicloud_secret_key=$ALICLOUD_SECRET_KEY"
           exitcode=$?
           echo "exitcode=$exitcode" >> $GITHUB_OUTPUT
           exit 0
 
+      # -----------------------------
+      # Fail if Terraform Plan errored
+      # -----------------------------
       - name: Fail if Plan Failed
         if: steps.plan.outputs.exitcode == '1'
         run: exit 1
 
+      # -----------------------------
+      # Terraform Apply (ONLY if changes)
+      # -----------------------------
       - name: Terraform Apply
         if: steps.plan.outputs.exitcode == '2'
         working-directory: terraform
-        run: terraform apply -auto-approve tfplan
+        run: |
+          terraform apply -auto-approve \
+            -var="alicloud_access_key=$ALICLOUD_ACCESS_KEY" \
+            -var="alicloud_secret_key=$ALICLOUD_SECRET_KEY" \
+            tfplan
 
+      # -----------------------------
+      # Install Ansible
+      # -----------------------------
       - name: Install Ansible
         run: |
-          sudo apt-get update -qq
+          sudo apt-get update
           sudo apt-get install -y ansible
 
+      # -----------------------------
+      # Setup SSH key
+      # -----------------------------
       - name: Setup SSH key
         run: |
           mkdir -p ~/.ssh
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
 
+      # -----------------------------
+      # Add server to known_hosts
+      # -----------------------------
       - name: Add server to known_hosts
         run: |
           ssh-keyscan -H 8.213.49.97 >> ~/.ssh/known_hosts
 
+      # -----------------------------
+      # Run Ansible Playbook
+      # -----------------------------
       - name: Run Ansible Playbook
         run: |
-          ansible-playbook -i inventory.ini Ansible/monitoring-server.yml
+          ansible-playbook -i Ansible/inventory.ini Ansible/monitoring-server.yml
