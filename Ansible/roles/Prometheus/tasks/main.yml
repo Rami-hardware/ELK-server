@@ -27,6 +27,15 @@
                 - targets: ["10.50.1.85:9182"]
                   labels:
                     instance: "Hudoor-ecs"
+                - targets: ["10.50.1.76:9182"]
+                  labels:
+                    instance: "Tasheel-Web"
+                - targets: ["10.50.6.206:9182"]
+                  labels:
+                    instance: "AD-01"
+                - targets: ["10.50.1.77:9182"]
+                  labels:
+                    instance: "ArcMate-Application"
 
     - name: Run Prometheus container
       community.docker.docker_container:
