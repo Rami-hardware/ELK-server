@@ -1,4 +1,4 @@
-- name: Deploy all Media server services
+- name: Deploy all monitoring-server services
   hosts: monitoring-server
   become: true
   roles:
