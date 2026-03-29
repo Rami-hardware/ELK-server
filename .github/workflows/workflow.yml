@@ -8,8 +8,8 @@ on:
       - master
 
 env:
-  TF_VAR_alicloud_access_key: ${{ secrets.ALICLOUD_ACCESS_KEY }}
-  TF_VAR_alicloud_secret_key: ${{ secrets.ALICLOUD_SECRET_KEY }}
+  ALICLOUD_ACCESS_KEY_ID: ${{ secrets.ALICLOUD_ACCESS_KEY }}
+  ALICLOUD_SECRET_ACCESS_KEY: ${{ secrets.ALICLOUD_SECRET_KEY }}
 
 jobs:
   Deploy:
@@ -68,4 +68,4 @@ jobs:
 
       - name: Run Ansible Playbook
         run: |
-          ansible-playbook -i inventory.ini Ansible/monitoring-server.yml  # fixed typo: Ansbile → Ansible
+          ansible-playbook -i inventory.ini Ansible/monitoring-server.yml
