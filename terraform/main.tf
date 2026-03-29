@@ -11,3 +11,4 @@ module "ecs" {
   vpc_id     = data.alicloud_vpcs.existing.vpcs[0].id
   vswitch_id = data.alicloud_vswitches.existing.vswitches[0].id
 }
+
