@@ -101,4 +101,4 @@ jobs:
       # -----------------------------
       - name: Run Ansible Playbook
         run: |
-          ansible-playbook -i inventory.ini Ansible/monitoring-server.yml
+          ansible-playbook -i inventory.ini Ansbile/monitoring-server.yml
