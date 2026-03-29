@@ -48,7 +48,7 @@
                 - source_labels: [__address__]
                   regex: "10.50.6.219:.*"
                   target_label: instance
-                  replacement: "ELK-server"
+                  replacement: "monitoring-server"
                 - source_labels: [__address__]
                   regex: "10.50.2.127:.*"
                   target_label: instance
