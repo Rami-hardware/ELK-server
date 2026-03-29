@@ -1,0 +1,27 @@
+- name: Ensure DNS is set via systemd-resolved (Docker-safe)
+  become: true
+  block:
+
+    - name: Configure systemd-resolved DNS
+      ansible.builtin.blockinfile:
+        path: /etc/systemd/resolved.conf
+        marker: "# {mark} ANSIBLE MANAGED DNS"
+        block: |
+          [Resolve]
+          DNS=8.8.8.8 1.1.1.1
+          FallbackDNS=9.9.9.9
+          DNSStubListener=yes
+        backup: true
+
+    - name: Restart systemd-resolved
+      ansible.builtin.systemd:
+        name: systemd-resolved
+        state: restarted
+        enabled: true
+
+    - name: Ensure /etc/resolv.conf points to systemd-resolved (NON-stub)
+      ansible.builtin.file:
+        src: /run/systemd/resolve/resolv.conf
+        dest: /etc/resolv.conf
+        state: link
+        force: true

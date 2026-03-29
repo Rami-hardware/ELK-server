@@ -5,7 +5,7 @@ on:
     branches:
       - development
       - staging
-      - master
+      - master   # change to main if needed
 
 env:
   ALICLOUD_ACCESS_KEY: ${{ secrets.ALICLOUD_ACCESS_KEY }}
@@ -14,6 +14,7 @@ env:
 jobs:
   Deploy:
     runs-on: ubuntu-latest
+
     steps:
       # -----------------------------
       # Checkout Repo
@@ -50,18 +51,54 @@ jobs:
         id: plan
         working-directory: terraform
         run: |
-          terraform plan \
-            -detailed-exitcode \
-            -out=tfplan || exitcode=$?
+          set +e
+          terraform plan -detailed-exitcode -out=tfplan
+          exitcode=$?
+          echo "exitcode=$exitcode" >> $GITHUB_OUTPUT
+          exit 0
 
-          echo "exitcode=${exitcode:-0}" >> $GITHUB_OUTPUT
-        continue-on-error: true
+      # -----------------------------
+      # Fail if Terraform Plan errored
+      # -----------------------------
+      - name: Fail if Plan Failed
+        if: steps.plan.outputs.exitcode == '1'
+        run: exit 1
 
       # -----------------------------
       # Terraform Apply (ONLY if changes)
       # -----------------------------
       - name: Terraform Apply
+        if: steps.plan.outputs.exitcode == '2'
         working-directory: terraform
+        run: terraform apply -auto-approve tfplan
+
+      # -----------------------------
+      # Install Ansible
+      # -----------------------------
+      - name: Install Ansible
         run: |
-          terraform apply \
-            -auto-approve tfplan
+          sudo apt-get update
+          sudo apt-get install -y ansible
+
+      # -----------------------------
+      # Setup SSH key
+      # -----------------------------
+      - name: Setup SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+
+      # -----------------------------
+      # Add server to known_hosts
+      # -----------------------------
+      - name: Add server to known_hosts
+        run: |
+          ssh-keyscan -H 8.213.49.97 >> ~/.ssh/known_hosts
+
+      # -----------------------------
+      # Run Ansible Playbook
+      # -----------------------------
+      - name: Run Ansible Playbook
+        run: |
+          ansible-playbook -i inventory.ini Ansible/monitoring-server.yml

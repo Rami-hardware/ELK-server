@@ -1,0 +1,5 @@
+- name: Deploy all Media server services
+  hosts: monitoring-server
+  become: true
+  roles:
+    - DNS
