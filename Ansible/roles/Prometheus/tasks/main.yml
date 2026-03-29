@@ -45,6 +45,10 @@
                   target_label: instance
                   replacement: "cognna-ecs"
                 - source_labels: [__address__]
+                  regex: "10.50.6.219:.*"
+                  target_label: instance
+                  replacement: "ELK-server"
+                - source_labels: [__address__]
                   regex: "10.50.2.127:.*"
                   target_label: instance
                   replacement: "FAC-Cloud-Share"
