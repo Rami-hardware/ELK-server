@@ -22,6 +22,12 @@
               static_configs:
                 - targets: ["localhost:9090"]
 
+            - job_name: "windows-ecs"
+              static_configs:
+                - targets: ["10.50.1.85:9182"]
+                  labels:
+                    instance: "Hudoor-ecs"
+
     - name: Run Prometheus container
       community.docker.docker_container:
         name: prometheus
