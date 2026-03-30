@@ -22,3 +22,24 @@
           GF_SECURITY_ADMIN_USER: admin
           GF_SECURITY_ADMIN_PASSWORD: admin
           GF_USERS_ALLOW_SIGN_UP: "false"
+
+    - name: Install CloudMonitor plugin
+      community.docker.docker_container_exec:
+        container: grafana
+        command: grafana-cli plugins install aliyun-cms-grafana
+
+    - name: Restart Grafana to load plugin
+      community.docker.docker_container:
+        name: grafana
+        state: started
+        restart: true
+
+    - name: Verify CloudMonitor plugin installed
+      community.docker.docker_container_exec:
+        container: grafana
+        command: grafana-cli plugins ls
+      register: grafana_plugins
+
+    - name: Show installed plugins
+      ansible.builtin.debug:
+        msg: "{{ grafana_plugins.stdout_lines | select('search', 'aliyun') | list }}"
