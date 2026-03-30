@@ -8,6 +8,16 @@
         state: directory
         mode: "0755"
 
+    - name: Stop Grafana container
+      community.docker.docker_container:
+        name: grafana
+        state: absent
+
+    - name: Remove Grafana data volume
+      community.docker.docker_volume:
+        name: grafana_data
+        state: absent
+
     - name: Run Grafana container
       community.docker.docker_container:
         name: grafana
