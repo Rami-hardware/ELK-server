@@ -73,11 +73,7 @@
                 - targets: ["10.50.1.77:9182"]
                   labels:
                     instance: "ArcMate-Application"
-
-    - name: Create monitoring Docker network
-      community.docker.docker_network:
-        name: monitoring
-        state: present
+      notify: Restart Prometheus
 
     - name: Run Prometheus container
       community.docker.docker_container:

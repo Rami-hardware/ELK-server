@@ -52,11 +52,7 @@
 
           compactor:
             working_directory: /loki/compactor
-
-    - name: Create monitoring Docker network
-      community.docker.docker_network:
-        name: monitoring
-        state: present
+      notify: Restart Loki
 
     - name: Run Loki container
       community.docker.docker_container:

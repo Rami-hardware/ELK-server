@@ -51,6 +51,7 @@
                     stream:
                 - output:
                     source: log
+      notify: Restart Promtail
 
     - name: Run Promtail container
       community.docker.docker_container:

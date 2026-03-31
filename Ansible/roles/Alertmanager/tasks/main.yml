@@ -12,6 +12,7 @@
       ansible.builtin.copy:
         dest: /opt/alertmanager/alertmanager.yml
         mode: "0644"
+        force: false
         content: |
           global:
             resolve_timeout: 5m
@@ -32,6 +33,7 @@
               target_matchers:
                 - severity="warning"
               equal: ['alertname', 'instance']
+      notify: Restart Alertmanager
 
     - name: Run Alertmanager container
       community.docker.docker_container:

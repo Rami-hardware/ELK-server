@@ -1,6 +1,13 @@
 - name: Deploy all monitoring-server services
   hosts: monitoring-server
   become: true
+
+  pre_tasks:
+    - name: Create monitoring Docker network
+      community.docker.docker_network:
+        name: monitoring
+        state: present
+
   roles:
     - DNS
     - Docker
