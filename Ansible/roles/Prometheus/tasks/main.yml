@@ -17,6 +17,11 @@
             scrape_interval: 15s
             evaluation_interval: 15s
 
+          alerting:
+            alertmanagers:
+              - static_configs:
+                  - targets: ["alertmanager:9093"]
+
           scrape_configs:
             - job_name: "prometheus"
               static_configs:
@@ -69,6 +74,11 @@
                   labels:
                     instance: "ArcMate-Application"
 
+    - name: Create monitoring Docker network
+      community.docker.docker_network:
+        name: monitoring
+        state: present
+
     - name: Run Prometheus container
       community.docker.docker_container:
         name: prometheus
@@ -77,6 +87,8 @@
         restart_policy: unless-stopped
         ports:
           - "9090:9090"
+        networks:
+          - name: monitoring
         volumes:
           - /opt/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
           - prometheus_data:/prometheus

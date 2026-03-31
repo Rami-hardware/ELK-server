@@ -6,4 +6,5 @@
     - Docker
     - Loki
     - Prometheus
+    - Alertmanager
     - Grafana
