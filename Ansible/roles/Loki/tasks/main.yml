@@ -53,6 +53,11 @@
           compactor:
             working_directory: /loki/compactor
 
+    - name: Create monitoring Docker network
+      community.docker.docker_network:
+        name: monitoring
+        state: present
+
     - name: Run Loki container
       community.docker.docker_container:
         name: loki
@@ -61,6 +66,8 @@
         restart_policy: unless-stopped
         ports:
           - "3100:3100"
+        networks:
+          - name: monitoring
         volumes:
           - /opt/loki/loki-config.yml:/etc/loki/local-config.yaml:ro
           - loki_data:/loki

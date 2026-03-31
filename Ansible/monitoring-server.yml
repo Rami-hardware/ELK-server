@@ -5,6 +5,7 @@
     - DNS
     - Docker
     - Loki
+    - Promtail
     - Prometheus
     - Alertmanager
     - Grafana
